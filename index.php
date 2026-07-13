@@ -2,9 +2,11 @@
 
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
-require("src/router.php");
+spl_autoload_register(function (string $className) {
+  require  "src/" . str_replace("\\", "/", $className) . ".php";
+});
 
-$router = new Router;
+$router = new Framework\Router;
 
 $router->addRoute("/", ["controller" => "home", "action" => "index"]);
 $router->addRoute("/products", ["controller" => "products", "action" => "index"]);
@@ -16,10 +18,10 @@ if (!$params) {
   die("No such route");
 }
 
-$controller = $params["controller"];
+$controller = "App\Controllers\\" . ucwords($params["controller"]);
 $action = $params["action"];
 
-require "src/controllers/{$controller}.php";
+// require "src/controllers/{$controller}.php";
 
 $controllerObject = new $controller;
 $controllerObject->$action();
