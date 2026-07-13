@@ -1,10 +1,25 @@
 <?php
 
-$dsn = "mysql:host='';dbname='';port:3306;charset=utf8";
-$conn = new PDO($dsn, "", "", [
-  PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-]);
+$path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
-$query = "SELECT * FROM product";
-$stmt = $conn->query($query);
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+require("src/router.php");
+
+$router = new Router;
+
+$router->addRoute("/", ["controller" => "home", "action" => "index"]);
+$router->addRoute("/products", ["controller" => "products", "action" => "index"]);
+$router->addRoute("/products/show", ["controller" => "products", "action" => "show"]);
+
+$params = $router->matchRoute($path);
+
+if (!$params) {
+  die("No such route");
+}
+
+$controller = $params["controller"];
+$action = $params["action"];
+
+require "src/controllers/{$controller}.php";
+
+$controllerObject = new $controller;
+$controllerObject->$action();
