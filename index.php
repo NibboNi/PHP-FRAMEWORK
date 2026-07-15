@@ -11,6 +11,9 @@ $router = new Framework\Router;
 $router->addRoute("/", ["controller" => "home", "action" => "index"]);
 $router->addRoute("/products", ["controller" => "products", "action" => "index"]);
 $router->addRoute("/products/show", ["controller" => "products", "action" => "show"]);
+$router->addRoute("/product/{slug:[\w-]+}", ["controller" => "products", "action" => "show"]);
+$router->addRoute("/{controller}/{id:\d+}/{action}");
+$router->addRoute("/{controller}/{action}");
 
 $params = $router->matchRoute($path);
 
@@ -20,8 +23,6 @@ if (!$params) {
 
 $controller = "App\Controllers\\" . ucwords($params["controller"]);
 $action = $params["action"];
-
-// require "src/controllers/{$controller}.php";
 
 $controllerObject = new $controller;
 $controllerObject->$action();
