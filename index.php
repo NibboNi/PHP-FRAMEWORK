@@ -8,6 +8,8 @@ spl_autoload_register(function (string $className) {
 
 $router = new Framework\Router;
 
+$router->addRoute("/{title}/{id:\d+}/{page}", ["controller" => "products", "action" => "showPage"]);
+$router->addRoute("/admon", ["controller" => "users", "action" => "index", "namespace" => "Admin"]);
 $router->addRoute("/", ["controller" => "home", "action" => "index"]);
 $router->addRoute("/products", ["controller" => "products", "action" => "index"]);
 $router->addRoute("/products/show", ["controller" => "products", "action" => "show"]);
@@ -15,14 +17,5 @@ $router->addRoute("/product/{slug:[\w-]+}", ["controller" => "products", "action
 $router->addRoute("/{controller}/{id:\d+}/{action}");
 $router->addRoute("/{controller}/{action}");
 
-$params = $router->matchRoute($path);
-
-if (!$params) {
-  die("No such route");
-}
-
-$controller = "App\Controllers\\" . ucwords($params["controller"]);
-$action = $params["action"];
-
-$controllerObject = new $controller;
-$controllerObject->$action();
+$dispatcher = new Framework\Dispatcher($router);
+$dispatcher->handle($path);
