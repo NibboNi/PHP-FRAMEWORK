@@ -2,6 +2,7 @@
 
 namespace Framework;
 
+use ReflectionClass;
 use ReflectionMethod;
 
 
@@ -20,7 +21,7 @@ class Dispatcher
     $controller = $this->getControllerName($params);
     $action = $this->getActionName($params);
 
-    $controllerObject = new $controller;
+    $controllerObject = $this->getObject($controller);
 
     $args = $this->getActionArguments($controller, $action, $params);
 
@@ -62,5 +63,26 @@ class Dispatcher
     $action = lcfirst(str_replace("-", "", ucwords(strtolower($action), "-")));
 
     return $action;
+  }
+
+  private function getObject(string $className): object
+  {
+    $reflector = new ReflectionClass($className);
+
+    $constructor = $reflector->getConstructor();
+
+    $dependencies = [];
+
+    if (!$constructor) {
+      return new $className;
+    }
+
+    foreach ($constructor->getParameters() as $parameter) {
+      $type = (string)$parameter->getType();
+
+      $dependencies[] = $this->getObject($type);
+    }
+
+    return new $className(...$dependencies);
   }
 }
