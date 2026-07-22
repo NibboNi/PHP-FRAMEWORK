@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Framework;
 
+use Framework\Exceptions\PageNotFoundException;
 use ReflectionMethod;
 
 class Dispatcher
@@ -15,7 +16,7 @@ class Dispatcher
     $params = $this->router->matchRoute($path);
 
     if (!$params) {
-      die("No such route");
+      throw new PageNotFoundException("No route matched for '{$path}'");
     }
 
     $controller = $this->getControllerName($params);
