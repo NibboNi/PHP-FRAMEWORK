@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 set_exception_handler(function (Throwable $exception) {
-  $showErrors = false;
+  $showErrors = true;
 
   if ($showErrors) {
     ini_set("display_errors", "1");
@@ -17,6 +17,9 @@ set_exception_handler(function (Throwable $exception) {
   throw $exception;
 });
 
+set_error_handler(function (int $errorNum, string $errorString, string $errorFile, int $errorLine) {
+  throw new ErrorException($errorString, 0, $errorNum, $errorFile, $errorLine);
+});
 
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
