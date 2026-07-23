@@ -3,7 +3,15 @@
 declare(strict_types=1);
 
 set_exception_handler(function (Throwable $exception) {
-  $showErrors = true;
+  if ($exception instanceof Framework\Exceptions\PageNotFoundException) {
+    $errorCode = 404;
+  } else {
+    $errorCode = 500;
+  }
+
+  http_response_code($errorCode);
+
+  $showErrors = false;
 
   if ($showErrors) {
     ini_set("display_errors", "1");
@@ -11,7 +19,7 @@ set_exception_handler(function (Throwable $exception) {
     ini_set("display_errors", "0");
     ini_set("log_errors", "1");
 
-    require "views/500.php";
+    require "views/{$errorCode}.php";
   }
 
   throw $exception;
